@@ -9,22 +9,25 @@ RUN apt-get install -y curl software-properties-common
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs
 
-RUN apt-get install -y binutils g++-8 git make patch python python3 python3-distutils
+RUN apt-get install -y \
+    binutils g++-7 g++-7-multilib linux-libc-dev-i386-cross git make patch python python3 python3-distutils && \
+    ln -s /usr/i686-linux-gnu/include /usr/include/i386-linux-gnu
 
-ARG TARGET_TOOLCHAIN_ARCH
+ARG TARGET_TOOLCHAIN_ARCH=""
+ARG TARGET_TRIPLE="${TARGET_TOOLCHAIN_ARCH}-linux-gnu"
 
-RUN [ `uname -m` = ${TARGET_TOOLCHAIN_ARCH} ] || \
-    apt-get install -y binutils-${TARGET_TOOLCHAIN_ARCH}-linux-gnu g++-8-${TARGET_TOOLCHAIN_ARCH}-linux-gnu
+RUN [ "x$(uname -m)" = "x${TARGET_TOOLCHAIN_ARCH}" ] || \
+    apt-get install -y binutils-${TARGET_TRIPLE} g++-${TARGET_TRIPLE}
 
-ENV CC=${TARGET_TOOLCHAIN_ARCH}-linux-gnu-gcc-8
-ENV CXX=${TARGET_TOOLCHAIN_ARCH}-linux-gnu-g++-8
-ENV AR=${TARGET_TOOLCHAIN_ARCH}-linux-gnu-ar
-ENV NM=${TARGET_TOOLCHAIN_ARCH}-linux-gnu-nm
-ENV RANLIB=${TARGET_TOOLCHAIN_ARCH}-linux-gnu-ranlib
-ENV READELF=${TARGET_TOOLCHAIN_ARCH}-linux-gnu-readelf
-ENV STRIP=${TARGET_TOOLCHAIN_ARCH}-linux-gnu-strip
-ENV CC_host=gcc-8
-ENV CXX_host=g++-8
+ENV CC=${TARGET_TRIPLE}-gcc
+ENV CXX=${TARGET_TRIPLE}-g++
+ENV AR=${TARGET_TRIPLE}-ar
+ENV NM=${TARGET_TRIPLE}-nm
+ENV RANLIB=${TARGET_TRIPLE}-ranlib
+ENV READELF=${TARGET_TRIPLE}-readelf
+ENV STRIP=${TARGET_TRIPLE}-strip
+ENV CC_host=gcc-7
+ENV CXX_host=g++-7
 ENV AR_host=ar
 ENV NM_host=nm
 ENV RANLIB_host=ranlib
